@@ -226,5 +226,16 @@ function changeValueOfPlayer(player_nrid_1, scoreid_1,myBarChartid_1)
     if(myBarChartid_1.datasets[0].bars[player_nrid_1-1].value-scoreid_1>=0)
         myBarChartid_1.datasets[0].bars[player_nrid_1-1].value-=scoreid_1;
     myBarChartid_1.update();
+    if(myBarChartid_1.datasets[0].bars[player_nrid_1-1].value==0)return 10;//oznacza wygran¹
+}
+function getValueOfPlayer(player_nrid_1,myBarChartid_1)
+{
+    return myBarChartid_1.datasets[0].bars[player_nrid_1-1].value;
+}
+function winnerFunction(player_nrid_1,myBarChartid_1)
+{
+    myBarChartid_1.datasets[0].bars[player_nrid_1-1].fillColor="rgba(255,215,0,0.5)";
+    myBarChartid_1.datasets[0].bars[player_nrid_1-1].value=200;
+    myBarChartid_1.update();
 }
 // changeValueOfPlayer(10,20,barChart_obj);

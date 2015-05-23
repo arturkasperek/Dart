@@ -25,15 +25,21 @@
                 <input type=range min=1 max=80 value=2 id=fader1 step=1 oninput="outputUpdate1(value)">
                 <output for=fader1 id=volume1>2</output>
             </div>
-            <div class="col-md-4" >
-                <label for=fader2>Liczba punktów na starcie</label>
+            <div class="col-md-2" >
+                <label for=fader2>Liczba punktów</label>
                 <input type=range min=1 max=3 value=1 id=fader2 step=1 oninput="outputUpdate2(value)">
                 <output for=fader2 id=volume2>301</output>
+            </div>
+            <div class="col-md-2" >
+                <label for=fader3>Tryb gry</label>
+                <input type=range min=1 max=3 value=1 id=fader3 step=1 oninput="outputUpdate3(value)">
+                <output for=fader3 id=volume3>Amatorski</output>
             </div>
             <div class="col-md-2" >
                 <button type="button" onclick="start()">Start! (Reset)</button>
             </div>
         </div>
+        <div><canvas id="scoreCanvas" width="500" height="100"></canvas></div>
         <div class="container">
            <canvas id="chartCanvas" width="1000" height="700"></canvas>
          </div>

@@ -22,7 +22,8 @@ var newCanvasSize= Math.min(screen.width,screen.height);
 newCanvasSize= newCanvasSize* 0.7;
 var MainCanvasVar = document.getElementById("mainCanvas");
 var MainCanvasVarCtx= MainCanvasVar.getContext("2d");
-
+var actualPlayerScore_canvas=document.getElementById("scoreCanvas");
+var actualPlayerScore_canvasCtx=actualPlayerScore_canvas.getContext("2d");
 writeMessage('Witaj w symulatorze gry w darta!! Proszę wybrać opcję gry');
 //rysujemy plansze darta
 var dart_image= new Image();
@@ -55,9 +56,13 @@ function start()
 {
     start_system=1;
     current_player=1;
+    help_var_3=0;
+    writeMessage('Witamy w nowej grze! Zaczyna gracz nr1');
     MainCavas=document.getElementById("chartCanvas");
     barChart_obj= newData( document.querySelector('#volume1').value, document.querySelector('#volume2').value,MainCavas);
     updateSelectedBar(barChart_obj);
+    stan_przed_kolejka=getValueOfPlayer(1,barChart_obj);
+    refreshScoreCanvas(current_player);
 }
 
 function outputUpdate1(vol) {
@@ -69,6 +74,12 @@ function outputUpdate2(vol) {
     else if(vol==2) document.querySelector('#volume2').value = 501;
     else document.querySelector('#volume2').value = 801;
 
+}
+function outputUpdate3(vol) {
+    if(vol==1)
+        document.querySelector('#volume3').value = "Amatorski";
+    else if(vol==2) document.querySelector('#volume3').value = "Double out";
+    else document.querySelector('#volume3').value = "Double in";
 }
 function lenghtP1P2(point_1,point_2)
 {
@@ -173,6 +184,15 @@ function calculatePoints(mousePos)//liczy punkty
     }
     return -1;//wynik zwracany gdy trafimy na jakąś krawędź kursorm
 }
+function refreshScoreCanvas(nr_player_var)
+{
+    actualPlayerScore_canvasCtx.clearRect(0, 0,400 , 100);
+    actualPlayerScore_canvasCtx.fillStyle='black';
+    actualPlayerScore_canvasCtx.font = "20px Georgia";
+    actualPlayerScore_canvasCtx.fillText('Aktualny stan gracza nr'+nr_player_var+' :', 25, 25);
+    actualPlayerScore_canvasCtx.fillStyle='blue';
+    actualPlayerScore_canvasCtx.fillText(getValueOfPlayer(nr_player_var,barChart_obj),275,25);
+}
 MainCanvasVar.addEventListener('mousemove', function(evt) {
     var mousePos = getMousePos(MainCanvasVar, evt);
     //var color=getMouseCanvasPixelColor(MainCanvasVarCtx,mousePos.x,mousePos.y);
@@ -180,28 +200,53 @@ MainCanvasVar.addEventListener('mousemove', function(evt) {
    // var score=calculatePoints([mousePos.x,mousePos.y]);
     changeColor([mousePos.x,mousePos.y]);
     var score=calculatePoints([mousePos.x,mousePos.y]);
-    if(score>0) {
+    if(score>=0) {
         MainCanvasVarCtx.clearRect(0, 0, 50, 50);
         MainCanvasVarCtx.font = "20px Georgia";
         MainCanvasVarCtx.fillText(score, 25, 25);
     }
 }, false);
 var help_var_3=0;
+var stan_przed_kolejka;
 MainCanvasVar.addEventListener('click',function(evt){
     if(start_system) {
         var mousePos = getMousePos(MainCanvasVar, evt);
         var score = calculatePoints([mousePos.x, mousePos.y]);
         if(score==-1){}
         else {
+
             if(help_var_3==3)
             {
                 help_var_3=0;
                 current_player++;
+
+
                 if(current_player>document.querySelector('#volume1').value)current_player=1;
+                refreshScoreCanvas(current_player);
+                stan_przed_kolejka=getValueOfPlayer(current_player,barChart_obj);
             }
-            writeMessage(score + ' ' + mousePos.x + ' ' + mousePos.y);
-            changeValueOfPlayer(current_player,score,barChart_obj);
+            writeMessage('Gracz nr'+ current_player+' trafia w '+score);
+           var ret_var= changeValueOfPlayer(current_player,score,barChart_obj);
             updateSelectedBar(barChart_obj);
+
+            if(ret_var==10)
+            {
+                winnerFunction(current_player,barChart_obj);
+                writeMessage('Zawodnik nr '+current_player+' wygrywa!!!!!!');
+                start_system=0;
+            }
+            if(help_var_3==2)
+            {
+                if(current_player>document.querySelector('#volume1').value)
+                {
+                    current_player=1;
+                    refreshScoreCanvas(current_player);
+                }
+                else if(current_player==document.querySelector('#volume1').value) refreshScoreCanvas(1);
+                else
+                    refreshScoreCanvas(current_player+1);
+            }
+            else refreshScoreCanvas(current_player);
             help_var_3++;
         }
     }
