@@ -1,0 +1,15 @@
+.divClass
+{
+    width: auto;
+    height: auto;
+}
+.tableDiv
+{
+    width: 50%;
+    margin: 0 auto;
+}
+#myTableData
+{
+    background-color: aqua;
+    margin-inside: 20px;
+}

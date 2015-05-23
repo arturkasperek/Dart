@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="Chart.js-master/Chart.js"></script>
+</head>
+<body>
+
+<div class="row">
+    <div class="col-md-5" ><canvas id="mainCanvas"></canvas></div>
+    <div class="col-md-6" >
+
+       <div> <canvas id="infoCanvas" width="600" height="50"></canvas></div>
+        <div class="row">
+            <div class="col-md-4" >
+                <label for=fader1>Liczba graczy</label>
+                <input type=range min=1 max=80 value=2 id=fader1 step=1 oninput="outputUpdate1(value)">
+                <output for=fader1 id=volume1>2</output>
+            </div>
+            <div class="col-md-4" >
+                <label for=fader2>Liczba punktów na starcie</label>
+                <input type=range min=1 max=3 value=1 id=fader2 step=1 oninput="outputUpdate2(value)">
+                <output for=fader2 id=volume2>301</output>
+            </div>
+            <div class="col-md-2" >
+                <button type="button" onclick="start()">Start! (Reset)</button>
+            </div>
+        </div>
+        <div class="container">
+           <canvas id="chartCanvas" width="1000" height="700"></canvas>
+         </div>
+</div>
+    <script src="chart_code.js"></script>
+    <script src="dart.js"></script>
+</body>
+</html>
