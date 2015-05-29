@@ -225,8 +225,16 @@ function changeValueOfPlayer(player_nrid_1, scoreid_1,myBarChartid_1)
 {
     if(myBarChartid_1.datasets[0].bars[player_nrid_1-1].value-scoreid_1>=0)
         myBarChartid_1.datasets[0].bars[player_nrid_1-1].value-=scoreid_1;
+    else
+    {
+        return -10;//oznacza przekroczenie wartoœci
+    }
     myBarChartid_1.update();
     if(myBarChartid_1.datasets[0].bars[player_nrid_1-1].value==0)return 10;//oznacza wygran¹
+}
+function setValueOfPlayerBar(player_nrid_1,new_value)
+{
+    myBarChartid_1.datasets[0].bars[player_nrid_1-1].value=new_value;
 }
 function getValueOfPlayer(player_nrid_1,myBarChartid_1)
 {

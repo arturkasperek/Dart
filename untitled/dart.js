@@ -52,6 +52,8 @@ var MainCavas;
 var barChart_obj;
 var start_system=0;
 var current_player;
+var current_Game_mode;
+var double_in_Table =new Array();
 function start()
 {
     start_system=1;
@@ -60,9 +62,18 @@ function start()
     writeMessage('Witamy w nowej grze! Zaczyna gracz nr1');
     MainCavas=document.getElementById("chartCanvas");
     barChart_obj= newData( document.querySelector('#volume1').value, document.querySelector('#volume2').value,MainCavas);
+    current_Game_mode=document.querySelector('#volume3').value;
+    if(current_Game_mode=="Double in")doubleInTableInit(double_in_Table,document.querySelector('#volume1').value);
     updateSelectedBar(barChart_obj);
     stan_przed_kolejka=getValueOfPlayer(1,barChart_obj);
     refreshScoreCanvas(current_player);
+}
+function doubleInTableInit(table_obj,number_of_player)
+{
+    for(var x=0;x<number_of_player;x++)
+    {
+        table_obj[x]=false;
+    }
 }
 
 function outputUpdate1(vol) {
@@ -209,12 +220,12 @@ MainCanvasVar.addEventListener('mousemove', function(evt) {
 var help_var_3=0;
 var stan_przed_kolejka;
 MainCanvasVar.addEventListener('click',function(evt){
+    document.getElementById('audiotag1').play();
     if(start_system) {
         var mousePos = getMousePos(MainCanvasVar, evt);
         var score = calculatePoints([mousePos.x, mousePos.y]);
         if(score==-1){}
         else {
-
             if(help_var_3==3)
             {
                 help_var_3=0;
@@ -225,16 +236,75 @@ MainCanvasVar.addEventListener('click',function(evt){
                 refreshScoreCanvas(current_player);
                 stan_przed_kolejka=getValueOfPlayer(current_player,barChart_obj);
             }
+            var lenghtFromCenter=lenghtP1P2([mousePos.x,mousePos.y],center_point);
             writeMessage('Gracz nr'+ current_player+' trafia w '+score);
-           var ret_var= changeValueOfPlayer(current_player,score,barChart_obj);
+           var ret_var= changeValueOfPlayer(current_player,score,barChart_obj);//funkcja zwraca 10 wtedy gdy dany słupek równa się 0, co oznacza że znany jest już wygrany
             updateSelectedBar(barChart_obj);
-
-            if(ret_var==10)
+            if(current_Game_mode=="Double in")
+            {
+                if(double_in_Table[current_player-1]==false&&lenghtFromCenter<offset_table[5]&&lenghtFromCenter > offset_table[4])double_in_Table[current_player-1]=true;
+                if(help_var_3==2&&double_in_Table[current_player-1]==false)
+                {
+                    writeMessage("Zawodnik nr "+current_player+" musi zacząć od rzutu w podwójne pole!!")
+                    setValueOfPlayerBar(current_player,stan_przed_kolejka);
+                }
+                if(ret_var==10)
+                {
+                    winnerFunction(current_player,barChart_obj);
+                    writeMessage('Zawodnik nr '+current_player+' wygrywa!!!!!!');
+                    start_system=0;
+                }
+            }
+            if(ret_var==10&&current_Game_mode=="Amatorski")
             {
                 winnerFunction(current_player,barChart_obj);
                 writeMessage('Zawodnik nr '+current_player+' wygrywa!!!!!!');
                 start_system=0;
             }
+            else if(ret_var==10&&current_Game_mode=="Double out")
+            {
+                if((lenghtFromCenter<offset_table[5]&&lenghtFromCenter > offset_table[4])||(lenghtFromCenter<offset_table[0]))//trafiliśmy w podwójne pole
+                {
+                    winnerFunction(current_player,barChart_obj);
+                    writeMessage('Zawodnik nr '+current_player+' wygrywa!!!!!!');
+                    start_system=0;
+                }
+                else
+                {
+                    writeMessage("Zawodnik nr"+current_player+" musi zakończyć rozrywkę rzutem w podwójne pole!!");
+                    if(help_var_3==0)
+                    {
+                        updateSelectedBar(barChart_obj);updateSelectedBar(barChart_obj);
+                    }
+                    else if(help_var_3==1)
+                    {
+                        updateSelectedBar(barChart_obj);
+                    }
+                    setValueOfPlayerBar(current_player,stan_przed_kolejka);
+                    help_var_3=2;
+                }
+            }
+            else if (ret_var==-10)
+            {
+                writeMessage('Zawodnik nr'+current_player+' przekroczył wynik!!');
+                //musimy zaaktulizować aktualnie podświetlany na zielono słupek
+                if(help_var_3==0)
+                {
+                    updateSelectedBar(barChart_obj);updateSelectedBar(barChart_obj);
+                }
+                else if(help_var_3==1)
+                {
+                    updateSelectedBar(barChart_obj);
+                }
+                setValueOfPlayerBar(current_player,stan_przed_kolejka);//przywracamy stan sprzed kolejki
+                help_var_3=2;//dzieki temu przerywana jest kolejka i bierzemy następnego gracza
+            }
+            else if(current_Game_mode=="Double out"&&help_var_3==2&&getValueOfPlayer(current_player,barChart_obj)==1)
+            {
+                writeMessage('Zawodnik nr '+current_player+' uzyskał niewłaściwy wynik!!');
+                setValueOfPlayerBar(current_player,stan_przed_kolejka);
+            }
+            //trochę namotane, poniższy kod zapewnia że komunikaty wyświetlane na canvasach informacyjnych wyglądają w miarę ok
             if(help_var_3==2)
             {
                 if(current_player>document.querySelector('#volume1').value)
